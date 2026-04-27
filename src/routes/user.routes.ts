@@ -4,17 +4,19 @@
 
 import { Router } from 'express';
 import { userController } from '../controllers';
-import { authenticate, validate } from '../middlewares';
-import { updateUserSchema, userIdParamSchema, paginationQuerySchema } from '../validators';
+import { authenticate, requirePermissions, validate } from '../middlewares';
+import { Permission } from '../constants';
+import { createUserSchema, updateUserSchema, userIdParamSchema, paginationQuerySchema } from '../validators';
 
 const router = Router();
 
 // All user routes require authentication
 router.use(authenticate);
 
-router.get('/', validate(paginationQuerySchema), userController.getAll);
-router.get('/:id', validate(userIdParamSchema), userController.getById);
-router.put('/:id', validate(updateUserSchema), userController.update);
-router.delete('/:id', validate(userIdParamSchema), userController.delete);
+router.post('/', requirePermissions(Permission.MANAGE_USERS), validate(createUserSchema), userController.create);
+router.get('/', requirePermissions(Permission.MANAGE_USERS), validate(paginationQuerySchema), userController.getAll);
+router.get('/:id', requirePermissions(Permission.MANAGE_USERS), validate(userIdParamSchema), userController.getById);
+router.put('/:id', requirePermissions(Permission.MANAGE_USERS), validate(updateUserSchema), userController.update);
+router.delete('/:id', requirePermissions(Permission.MANAGE_USERS), validate(userIdParamSchema), userController.delete);
 
 export default router;

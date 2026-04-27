@@ -2,9 +2,9 @@
 // Mongoose User model
 // ---------------------------------------------------------
 
-import mongoose, { Document, Schema, Model } from 'mongoose';
+import mongoose, { Document, Schema, Model, Types } from 'mongoose';
 import bcryptjs from 'bcryptjs';
-import { UserRole } from '../constants';
+import { IRoleDocument } from './role.model';
 
 // ─── Interfaces ─────────────────────────────────────────
 
@@ -12,7 +12,7 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
-  role: UserRole;
+  roleId: Types.ObjectId | IRoleDocument;
 }
 
 export interface IUserDocument extends IUser, Document {
@@ -51,10 +51,10 @@ const userSchema = new Schema<IUserDocument>(
       minlength: [8, 'Password must be at least 8 characters'],
       select: false, // never return password by default
     },
-    role: {
-      type: String,
-      enum: Object.values(UserRole),
-      default: UserRole.USER,
+    roleId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Role',
+      required: [true, 'Role assignment is required'],
     },
   },
   {
@@ -74,6 +74,7 @@ const userSchema = new Schema<IUserDocument>(
 // ─── Indexes ────────────────────────────────────────────
 
 userSchema.index({ createdAt: -1 });
+userSchema.index({ roleId: 1 });
 
 // ─── Pre-save hook: hash password ───────────────────────
 

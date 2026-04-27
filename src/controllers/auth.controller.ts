@@ -32,6 +32,15 @@ class AuthController {
     const tokens = await authService.refreshTokens(refreshToken);
     sendSuccess(res, HttpStatus.OK, Messages.TOKEN_REFRESHED, { tokens });
   });
+
+  /**
+   * GET /api/auth/me
+   */
+  getMe = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const userId = (req as any).user.id;
+    const user = await authService.getMe(userId);
+    sendSuccess(res, HttpStatus.OK, Messages.USERS_FETCHED, user);
+  });
 }
 
 export const authController = new AuthController();

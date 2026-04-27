@@ -24,7 +24,7 @@ class UserRepository {
    * Find a user by ID. Optionally include the password field.
    */
   async findById(id: string, includePassword = false): Promise<IUserDocument | null> {
-    const query = User.findById(id);
+    const query = User.findById(id).populate('roleId');
     if (includePassword) query.select('+password');
     return query.exec();
   }
@@ -33,7 +33,7 @@ class UserRepository {
    * Find a user by email. Optionally include the password field.
    */
   async findByEmail(email: string, includePassword = false): Promise<IUserDocument | null> {
-    const query = User.findOne({ email });
+    const query = User.findOne({ email }).populate('roleId');
     if (includePassword) query.select('+password');
     return query.exec();
   }
@@ -54,6 +54,7 @@ class UserRepository {
         .sort({ [sortField]: sortOrder })
         .skip(skip)
         .limit(limit)
+        .populate('roleId')
         .exec(),
       User.countDocuments().exec(),
     ]);
@@ -77,14 +78,14 @@ class UserRepository {
    * Update a user by ID. Returns the updated document.
    */
   async updateById(id: string, dto: UpdateUserDto): Promise<IUserDocument | null> {
-    return User.findByIdAndUpdate(id, { $set: dto }, { new: true, runValidators: true }).exec();
+    return User.findByIdAndUpdate(id, { $set: dto }, { new: true, runValidators: true }).populate('roleId').exec();
   }
 
   /**
    * Delete a user by ID. Returns the deleted document.
    */
   async deleteById(id: string): Promise<IUserDocument | null> {
-    return User.findByIdAndDelete(id).exec();
+    return User.findByIdAndDelete(id).populate('roleId').exec();
   }
 
   /**

@@ -9,6 +9,14 @@ import { HttpStatus, Messages } from '../constants';
 
 class UserController {
   /**
+   * POST /api/users
+   */
+  create = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const user = await userService.create(req.body);
+    sendSuccess(res, HttpStatus.CREATED, Messages.USER_CREATED, user);
+  });
+
+  /**
    * GET /api/users
    */
   getAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {

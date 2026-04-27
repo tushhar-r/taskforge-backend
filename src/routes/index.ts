@@ -5,7 +5,10 @@
 import { Router, Request, Response } from 'express';
 import authRoutes from './auth.routes';
 import userRoutes from './user.routes';
-import taskRoutes from './task.routes';
+import teamRoutes from './team.routes';
+import clientRoutes from './client.routes';
+import timesheetRoutes from './timesheet.routes';
+import roleRoutes from './role.routes';
 
 const router = Router();
 
@@ -21,6 +24,9 @@ router.get('/health', (_req: Request, res: Response) => {
 // Mount feature routes
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
-router.use('/tasks', taskRoutes);
+router.use('/teams', teamRoutes);
+router.use('/clients', clientRoutes);
+router.use('/timesheet', timesheetRoutes);
+router.use('/roles', roleRoutes);
 
 export default router;

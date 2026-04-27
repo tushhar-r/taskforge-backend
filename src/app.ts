@@ -28,7 +28,7 @@ app.use(
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 10000, // Loosened for development/testing
   standardHeaders: true,
   legacyHeaders: false,
   message: {

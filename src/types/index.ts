@@ -3,10 +3,10 @@
 // ---------------------------------------------------------
 
 import { IUserDocument } from '../models/user.model';
+import { Permission, TimesheetStatus } from '../constants';
 
 /**
  * Extend Express Request with authenticated user payload.
- * This avoids polluting the global namespace with loose `any` types.
  */
 declare global {
   namespace Express {
@@ -59,7 +59,7 @@ export interface PaginationQuery {
 export interface JwtPayload {
   userId: string;
   email: string;
-  role: string;
+  roleId: string;
 }
 
 export interface TokenPair {
@@ -78,7 +78,7 @@ export interface SanitizedUser {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: SanitizedRole;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -87,13 +87,13 @@ export interface CreateUserDto {
   name: string;
   email: string;
   password: string;
-  role?: string;
+  roleId?: string;
 }
 
 export interface UpdateUserDto {
   name?: string;
   email?: string;
-  role?: string;
+  roleId?: string;
 }
 
 export interface LoginDto {
@@ -101,41 +101,136 @@ export interface LoginDto {
   password: string;
 }
 
-// ─── Task DTOs ──────────────────────────────────────────
+// ─── Role DTOs ──────────────────────────────────────────
 
-export interface SanitizedTask {
+export interface SanitizedRole {
   id: string;
-  title: string;
+  name: string;
+  permissions: string[];
   description?: string;
-  status: string;
-  priority: string;
-  tags: string[];
-  dueDate?: Date;
-  userId: string;
+  isSystem: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface CreateTaskDto {
+export interface CreateRoleDto {
+  name: string;
+  permissions: Permission[];
+  description?: string;
+}
+
+export interface UpdateRoleDto {
+  name?: string;
+  permissions?: Permission[];
+  description?: string;
+}
+
+// ─── Team DTOs ──────────────────────────────────────────
+
+export interface SanitizedTeam {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateTeamDto {
+  name: string;
+  description?: string;
+}
+
+export interface UpdateTeamDto {
+  name?: string;
+  description?: string;
+}
+
+export interface AddMemberDto {
+  userId: string;
+  role: 'manager' | 'employee';
+}
+
+// ─── Client DTOs ────────────────────────────────────────
+
+export interface SanitizedClient {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  companyName?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateClientDto {
+  name: string;
+  email?: string;
+  phone?: string;
+  companyName?: string;
+}
+
+export interface UpdateClientDto {
+  name?: string;
+  email?: string;
+  phone?: string;
+  companyName?: string;
+}
+
+// ─── Timesheet DTOs ─────────────────────────────────────
+
+export interface TaskLogDto {
   title: string;
   description?: string;
-  status?: string;
-  priority?: string;
+  durationMinutes: number;
   tags?: string[];
-  dueDate?: string | Date;
 }
 
-export interface UpdateTaskDto {
-  title?: string;
+export interface SanitizedTaskLog {
+  id: string;
+  title: string;
   description?: string;
-  status?: string;
-  priority?: string;
-  tags?: string[];
-  dueDate?: string | Date;
+  durationMinutes: number;
+  tags: string[];
 }
 
-export interface TaskFilterQuery extends PaginationQuery {
-  status?: string;
-  search?: string;
+export interface SanitizedTimesheetEntry {
+  id: string;
+  employeeId: string;
+  employeeName?: string;
+  teamId: string;
+  teamName?: string;
+  clientId: string;
+  clientName?: string;
+  date: Date;
+  totalHours: number;
+  notes?: string;
+  status: TimesheetStatus;
+  tasks: SanitizedTaskLog[];
+  submittedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
+export interface CreateTimesheetEntryDto {
+  teamId: string;
+  clientIds: string[];
+  date: string | Date;
+  totalHours?: number;
+  notes?: string;
+  tasks?: TaskLogDto[];
+}
+
+export interface UpdateTimesheetEntryDto {
+  totalHours?: number;
+  notes?: string;
+  tasks?: TaskLogDto[];
+}
+
+export interface TimesheetFilterQuery extends PaginationQuery {
+  startDate?: string;
+  endDate?: string;
+  clientId?: string;
+  teamId?: string;
+  employeeId?: string;
+  status?: TimesheetStatus;
+}
